@@ -1,0 +1,8 @@
+.idea/modules.xml
+.idea/workspace.xml
+.idea/*.iml
+
+bin/**/*.exe
+
+vendor/
+

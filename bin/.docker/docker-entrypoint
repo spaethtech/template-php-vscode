@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# NOTE: This script should not be used directly, but should be sourced after setting the following variables:
+# - extensions (Array) Any valid script extension
+# - command (String) The command to execute
+
+IFS=", " read -r -a EXTENSIONS <<< "$EXTENSIONS"
+
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
+script_file_provided=false
+
+# IF the first are is a file that exists...
+if [ -f "$1" ] || [ -f "$WORKING_DIR/$1" ]
+then
+    # THEN, check the extension against valid script extensions.
+    extension=$([[ "$1" = *.* ]] && echo ".${1##*.}" || echo "")
+
+    # Check to see if the extensions array contains the current extension (with or without a leading '.').
+    # shellcheck disable=SC2076
+    if [[ " ${EXTENSIONS[*]} " =~ " ${extension} " ]] || [[ " ${EXTENSIONS[*]} " =~ " ${extension##.} " ]]
+    then
+        script_file_provided=true
+    fi
+fi
+
+# IF the first argument provided:
+# - Is an option (prefixed with - or --)
+# - Is NOT another command
+# - Is a file that exists AND has a valid file extension
+if [ "${1#-}" != "$1" ] || [ -z "$(command -v "$1")" ] || [ "$script_file_provided" = true ]
+then
+    # THEN, execute the node command with the remaining arguments!
+    # shellcheck disable=SC2154
+    set -- "$COMMAND" "$@"
+fi
+
+# OTHERWISE, use the first argument as the command!
+exec "$@"

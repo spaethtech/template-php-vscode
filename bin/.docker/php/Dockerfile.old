@@ -1,0 +1,36 @@
+ARG VERSION
+FROM php:${VERSION}
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV BINARY_DIR=/usr/local/bin
+
+COPY php/stages/ /tmp/stages/
+
+RUN /tmp/stages/0-users.sh
+RUN /tmp/stages/1-extensions.sh
+RUN /tmp/stages/2-composer.sh
+RUN /tmp/stages/3-robo.sh
+
+COPY docker-entrypoint ${BINARY_DIR}/
+#COPY php/docker-php-entrypoint ${BINARY_DIR}/docker-php-entrypoint
+
+RUN unset BINARY_DIR && rm -rf /var/lib/apt/lists/*
+
+ENV PATH "/home/php/bin:$PATH"
+ENV PROJECT_DIR=/opt/project
+ENV VIRTUAL_ENV=guest
+
+ENV COMMAND=php
+ENV EXTENSIONS=php,php3,php4,php5,phtml
+ENV WORKING_DIR=${WORKING_DIR:-/opt/project}
+
+USER php
+
+WORKDIR ${WORKING_DIR}
+
+EXPOSE 9003
+
+VOLUME [ "${PROJECT_DIR}" ]
+
+ENTRYPOINT [ "docker-entrypoint" ]
+CMD [ "php" ]

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+INCLUDE_DIR=$(realpath "$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"/.docker)
+
+export COMMAND_RUN=(--tty)
+export COMMAND_TAG=node
+export COMMAND_VER=16
+export COMMAND_DIR=/usr/src/app
+
+# shellcheck source=.docker/docker-command disable=SC1091
+source "$INCLUDE_DIR"/docker-command yo "$@"

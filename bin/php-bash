@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+INCLUDE_DIR=$(realpath "$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"/.docker)
+
+export COMMAND_RUN=(--tty)
+export COMMAND_TAG=php
+export COMMAND_VER=7.4
+export COMMAND_DIR=/opt/project
+
+# shellcheck disable=SC2059
+QUOTED_ARGS="$(printf "${1+ %q}" "$@" | xargs)"
+
+if [ -n "$QUOTED_ARGS" ]
+then
+    # shellcheck source=.docker/docker-command disable=SC1091
+    source "$INCLUDE_DIR"/docker-command bash -c "$QUOTED_ARGS"
+else
+    # shellcheck source=.docker/docker-command disable=SC1091
+    source "$INCLUDE_DIR"/docker-command bash
+fi
